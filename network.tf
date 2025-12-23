@@ -15,6 +15,17 @@ resource "aws_subnet" "private_backend" {
 }
 
 # ==============================================================================
+# Route Table Associations
+# ==============================================================================
+
+resource "aws_route_table_association" "private_backend" {
+  for_each = var.private_backend_subnet_config
+
+  subnet_id      = each.value.id
+  route_table_id = var.private_route_table_id
+}
+
+# ==============================================================================
 # Security Groups
 # ==============================================================================
 
