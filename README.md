@@ -1,47 +1,97 @@
-# github-terraform-template
+# databricks-portfolio-baseline-tf-module - Databricks Portfolio Baseline Terraform Module
 
-This repo contains a template Terraform pipeline. To modify this template, please either create an issue or submit a pull request with the changes.
+This repo contains a module to deploy the foundational components for a new portfolio being onboarded to Databricks. This includes the AWS KMS keys for workspace storage and managed services, and their associated Databricks Encryption Key configurations, as well as the AWS VPC interface endpoints for Databricks REST and SCC Relay endpoints, and their associated Databricks VPC endpoint registration objects.
 
-### terraform-checks.yml ###
-This workflow will run when any new commit is pushed to any branch. The tools run are listed below.
+## Example Usage
+```
+locals {
+  # Private /28 subnets (Databricks backend VPCE)
+  private_backend_subnet_config = {
+    az1 = { 
+      cidr = "10.111.172.48/28"
+      az = "eu-west-2a" 
+    }
+    az2 = { 
+      cidr = "10.111.172.64/28"
+      az = "eu-west-2b" 
+    }
+    az3 = { 
+      cidr = "10.111.172.80/28"
+      az = "eu-west-2c" 
+    }
+  }
+}
 
-| Tool              | Description              |
-|-------------------|--------------------------|
-| terraform fmt     | format terraform         |
-| terraform validate | validate terraform       |
-| tflnt             | lint terraform           |
-| tfsec             | run static code analysis |
-| checkov           | run static code analysis |
+ module "databricks_portfolio" {
+    source = "git::git::https://github.com/UKHomeOffice/databricks-portfolio-baseline-tf-module.git?ref=main"
 
-### terraform-main.yml ###
-This workflow is used to deploy Terraform to your environment. The steps run will depend on the GitHub event that triggered it, these are detailed below.
-This workflow will only trigger when changes are made to tf files in your working directory, this is set to ```./terraform``` by default.
-Note that this calls ```terraform-template.yml``` so that it can be easily reused with multiple Terraform root modules.
+    vpc_id                        = "vpc-xxxxxxxxxxxxxxxxx"
+    private_route_table_id        = var.private_route_table_id
+    databricks_account_id         = var.databricks_account_id
+    private_backend_subnet_config = local.private_backend_subnet_config
+    sg_egress_ports               = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
-| Step            | Description               | Trigger             |
-|-----------------|---------------------------|---------------------|
-| terraform plan  | create terraform execution plan | pull request        |
-| terraform apply | apply terraform with auto approve | merge pull request  |
-| tf summariser   | add a summary of terraform changes to pr | pull request        |
-| infracost       | add a cost summary to pr  | pull request        |
+    resource_prefix = "dsa-databricks"
+    tags            = local.tags
+ }
+```
 
-### Infracost ###
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-Note that the steps to run Infracost are commented out in ```terraform-template.yml``` as an API key is required.
-You will need to set an API key in your GitHub repo secrets called ```INFRACOST_API_KEY```
-This variable will need to be uncommented in ```terraform-main.yml``` and ```terraform-template.yml```
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.24.0 |
 
-### Terraform State Backend ###
+## Providers
 
-A backend should be configured to store Terraform state remotely. An example for AWS S3 is commented out in ```backend.tf```
-You will need set the following variables in your GitHub repo secrets:
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.24.0 |
+| <a name="provider_databricks"></a> [databricks](#provider\_databricks) | ~> 1.84 |
 
- - ```TERRAFORM_STATE_BUCKET ```
- - ```TERRAFORM_STATE_KEY```
- - ```TERRAFORM_STATE_DYNAMODB_TABLE ```
+## Modules
 
-These variables will need to be uncommented in ```terraform-checks.yml```, ```terraform-main.yml``` and ```terraform-template.yml``` (both for the variable declaration and as arguments to terraform init)
+No modules.
 
-### AWS Credentials ###
+## Resources
 
-```aws-actions/configure-aws-credentials@v1``` can be used to configure AWS credentials. An example is commented out in ```terraform-checks.yml``` and ```terraform-template.yml```
+| Name | Type |
+|------|------|
+| [aws_kms_key.databricks_managed_services_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_kms_key.databricks_workspace_storage_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_kms_alias.databricks_managed_services_key_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
+| [aws_kms_alias.databricks_workspace_storage_key_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
+| [databricks_mws_customer_managed_keys.managed_services](https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/mws_customer_managed_keys) | resource |
+| [databricks_mws_customer_managed_keys.workspace_storage](https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/mws_customer_managed_keys) | resource |
+| [aws_subnet.private_backend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_security_group.databricks_classic_compute](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.databricks_backend_vpce](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_route_table_association.private_backend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_vpc_endpoint.databricks_rest](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_endpoint.databricks_scc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [databricks_mws_vpc_endpoint.databricks_rest](https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/mws_vpc_endpoint) | resource |
+| [databricks_mws_vpc_endpoint.databricks_scc](https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/mws_vpc_endpoint) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC in which the Databricks backend VPC endpoints will be deployed | `string` | n/a | yes |
+| <a name="input_private_route_table_id"></a> [private\_route\_table\_id](#input\_private\_route\_table\_id) | The ID of the private AWS route table to associate subnets to | `string` | n/a | yes |
+| <a name="input_databricks_account_id"></a> [databricks\_account\_id](#input\_databricks\_account\_id) | The ID of the Databricks account to deploy Databricks resources to | `string` | n/a | yes |
+| <a name="input_private_backend_subnet_config"></a> [private\_backend\_subnet\_config](#input\_private\_backend\_subnet\_config) | A map of subnet CIDRs and AZs for the private subnets | `map(string)` | `{}` | yes |
+| <a name="input_sg_egress_ports"></a> [sg\_egress\_ports](#input\_sg\_egress\_ports) | A list of ports to allow outbound network traffic from the classic compute clusters SG | `list(string)` | `[]` | no |
+| <a name="input_resource_prefix"></a> [vpc\_id](#input\_resource\_prefix) | The prefix to use when applying names to resources | `string` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_databricks_rest_vpce_id"></a> [databricks\_rest\_vpce\_id](#output\_databricks\_rest\_vpce\_id) | ID of the Databricks VPC Endpoint Registraion used for REST |
+| <a name="output_databricks_scc_vpce_id"></a> [databricks\_scc\_vpce\_id](#output\_databricks\_scc\_vpce\_id) | ID of the Databricks VPC Endpoint Registraion used for SCC Relay |
+| <a name="output_databricks_workspace_storage_key_id"></a> [databricks\_workspace\_storage\_key\_id](#output\_databricks\_workspace\_storage\_key\_id) | ID of the Databricks Encryption Key Configuration used for workspace storage |
+| <a name="output_databricks_managed_services_key_id"></a> [databricks\_managed\_services\_key\_id](#output\_databricks\_managed\_services\_key\_id) | ID of the Databricks Encryption Key Configuration used for managed services |
+<!-- END_TF_DOCS -->
