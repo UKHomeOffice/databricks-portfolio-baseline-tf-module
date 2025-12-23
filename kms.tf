@@ -131,7 +131,7 @@ resource "aws_kms_key" "databricks_workspace_storage_key" {
   policy = data.aws_iam_policy_document.databricks_workspace_storage_cmk.json
 }
 
-resource "aws_kms_alias" "storage_customer_managed_key_alias" {
+resource "aws_kms_alias" "databricks_workspace_storage_key_alias" {
   name          = "alias/databricks-workspace-storage-key-alias"
   target_key_id = aws_kms_key.databricks_workspace_storage_key.key_id
 }
