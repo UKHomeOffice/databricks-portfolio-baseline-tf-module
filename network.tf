@@ -3,7 +3,7 @@
 # ==============================================================================
 
 resource "aws_subnet" "private_backend" {
-  for_each = local.private_backend_subnets
+  for_each = var.private_backend_subnet_config
 
   vpc_id            = var.vpc_id
   cidr_block        = each.value.cidr
