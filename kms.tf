@@ -21,7 +21,7 @@ resource "aws_kms_key" "catalog_storage" {
         "Sid" : "Allow IAM Role to use the key",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+          "AWS" : "arn:aws:iam::${local.aws_account_id}:role/${local.uc_iam_role}"
         },
         "Action" : [
           "kms:Decrypt",
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "databricks_managed_services_cmk" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = [data.aws_caller_identity.current.account_id]
+      identifiers = [local.aws_account_id]
     }
     actions   = ["kms:*"]
     resources = ["*"]
@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "databricks_workspace_storage_cmk" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = [data.aws_caller_identity.current.account_id]
+      identifiers = [local.aws_account_id]
     }
     actions   = ["kms:*"]
     resources = ["*"]
