@@ -26,6 +26,40 @@ resource "aws_route_table_association" "private_backend" {
 }
 
 # ==============================================================================
+# # NACL for Databricks VPC endpoint private subnets
+# ==============================================================================
+
+resource "aws_network_acl" "private_backend" {
+  vpc_id    = var.vpc_id
+  subnet_ids = [for s in aws_subnet.private_backend : s.id]
+
+  ingress {
+    rule_no    = 100
+    protocol   = "-1"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  egress {
+    rule_no    = 100
+    protocol   = "-1"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  tags = merge(
+    var.tags, 
+    {
+      Name = "${var.resource_prefix}-nacl-private-backend"
+    }
+  )
+}
+
+# ==============================================================================
 # Security Groups
 # ==============================================================================
 
