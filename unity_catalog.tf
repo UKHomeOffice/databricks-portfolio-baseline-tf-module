@@ -10,14 +10,14 @@ resource "time_sleep" "wait_60_seconds" {
 resource "databricks_storage_credential" "catalog_storage_credential" {
   name = "${var.uc_catalog_name}-storage-credential"
   aws_iam_role {
-    role_arn = "arn:aws:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+    role_arn = "arn:aws:iam::${local.aws_account_id}:role/${local.uc_iam_role}"
   }
   isolation_mode = "ISOLATION_MODE_ISOLATED"
 }
 
 # Unity Catalog Trust Policy - Data Source
 data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
-  aws_account_id        = var.aws_account_id
+  aws_account_id        = local.aws_account_id
   role_name             = local.uc_iam_role
   unity_catalog_iam_arn = var.unity_catalog_iam_arn
   external_id           = databricks_storage_credential.catalog_storage_credential.aws_iam_role[0].external_id
@@ -25,7 +25,7 @@ data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
 
 # Unity Catalog Policy - Data Source
 data "databricks_aws_unity_catalog_policy" "unity_catalog" {
-  aws_account_id = var.aws_account_id
+  aws_account_id = local.aws_account_id
   bucket_name    = var.uc_catalog_name
   role_name      = local.uc_iam_role
   kms_name       = aws_kms_alias.catalog_storage_key_alias.arn
