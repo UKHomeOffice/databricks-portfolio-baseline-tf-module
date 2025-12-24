@@ -11,50 +11,6 @@ locals {
   uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
 }
 
-# Unity Catalog KMS
-resource "aws_kms_key" "catalog_storage" {
-  description = "KMS key for Databricks catalog storage ${var.resource_prefix}"
-  policy = jsonencode({
-    Version : "2012-10-17",
-    "Id" : "key-policy-catalog-storage-${var.resource_prefix}",
-    Statement : [
-      {
-        "Sid" : "Enable IAM User Permissions",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : [var.cmk_admin_arn]
-        },
-        "Action" : "kms:*",
-        "Resource" : "*"
-      },
-      {
-        "Sid" : "Allow IAM Role to use the key",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : "arn:aws:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
-        },
-        "Action" : [
-          "kms:Decrypt",
-          "kms:Encrypt",
-          "kms:GenerateDataKey*"
-        ],
-        "Resource" : "*"
-      }
-    ]
-  })
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.resource_prefix}-catalog-storage-key"
-    }
-  )
-}
-
-resource "aws_kms_alias" "catalog_storage_key_alias" {
-  name          = "alias/${var.resource_prefix}-catalog-storage-key"
-  target_key_id = aws_kms_key.catalog_storage.id
-}
-
 # Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
 resource "databricks_storage_credential" "catalog_storage_credential" {
   name = "${var.uc_catalog_name}-storage-credential"
