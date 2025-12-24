@@ -14,7 +14,7 @@ locals {
 
   unity_catalog_iam_arn = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
 
-  cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
+  cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws:iam::${local.aws_account_id}:root" : var.cmk_admin_arn
 
   uc_iam_role        = "${var.resource_prefix}-catalog"
   uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
