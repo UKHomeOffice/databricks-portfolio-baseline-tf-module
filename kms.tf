@@ -1,16 +1,53 @@
 # ==============================================================================
-# KMS
+# KMS for UC catalog
 # ==============================================================================
 
-resource "aws_kms_key" "databricks_unity_catalog" {
-  enable_key_rotation = true
-  tags                = local.common_tags
+resource "aws_kms_key" "catalog_storage" {
+  description = "KMS key for Databricks catalog storage ${var.resource_prefix}"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    "Id" : "key-policy-catalog-storage-${var.resource_prefix}",
+    Statement : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [local.cmk_admin_value]
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow IAM Role to use the key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+        },
+        "Action" : [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey*"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.resource_prefix}-catalog-storage-key"
+    }
+  )
 }
 
-resource "aws_kms_alias" "databricks_unity_catalog" {
-  name          = "alias/databricks/unity-catalog"
-  target_key_id = aws_kms_key.databricks_unity_catalog.key_id
+resource "aws_kms_alias" "catalog_storage_key_alias" {
+  name          = "alias/${var.resource_prefix}-catalog-storage-key"
+  target_key_id = aws_kms_key.catalog_storage.id
 }
+
+# ==============================================================================
+# KMS for Databricks Managed Services
+# ==============================================================================
 
 data "aws_iam_policy_document" "databricks_managed_services_cmk" {
   version = "2012-10-17"
@@ -57,6 +94,10 @@ resource "databricks_mws_customer_managed_keys" "managed_services" {
   }
   use_cases = ["MANAGED_SERVICES"]
 }
+
+# ==============================================================================
+# KMS for Databricks Workspace Storage
+# ==============================================================================
 
 data "aws_iam_policy_document" "databricks_workspace_storage_cmk" {
   version = "2012-10-17"
