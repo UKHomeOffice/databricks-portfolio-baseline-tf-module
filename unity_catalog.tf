@@ -6,11 +6,6 @@ resource "time_sleep" "wait_60_seconds" {
   create_duration = "60s"
 }
 
-locals {
-  uc_iam_role        = "${var.resource_prefix}-catalog"
-  uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
-}
-
 # Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
 resource "databricks_storage_credential" "catalog_storage_credential" {
   name = "${var.uc_catalog_name}-storage-credential"
