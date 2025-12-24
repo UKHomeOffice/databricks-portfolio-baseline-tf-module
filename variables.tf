@@ -44,6 +44,11 @@ variable "sg_egress_ports" {
   default     = [null]
 }
 
+variable "uc_catalog_name" {
+  description = "UC catalog name."
+  type        = string
+}
+
 # Common variables to be applied to a large number of resources
 variable "resource_prefix" {
   description = "Prefix for the resource names."
