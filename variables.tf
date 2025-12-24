@@ -11,12 +11,6 @@ variable "aws_partition" {
   default     = "aws"
 }
 
-variable "aws_account_id" {
-  description = "ID of the AWS account to deploy to."
-  type        = string
-  sensitive   = true
-}
-
 # High Level Databricks Variables
 variable "databricks_account_id" {
   description = "ID of the Databricks account to deploy to."
