@@ -17,3 +17,13 @@ output "databricks_managed_services_key_id" {
   description = "ID of the Databricks Encryption Key Configuration used for managed services"
   value       = databricks_mws_customer_managed_keys.managed_services.customer_managed_key_id
 }
+
+output "catalog_bucket_name" {
+  description = "Name of the S3 bucket used for the UC catalog storage"
+  value       = aws_s3_bucket.unity_catalog_bucket.bucket
+}
+
+output "catalog_name" {
+  description = "Name of the UC catalog that was created"
+  value       = databricks_catalog.workspace_catalog.name
+}
