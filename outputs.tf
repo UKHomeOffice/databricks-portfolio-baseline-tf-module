@@ -8,6 +8,16 @@ output "databricks_scc_vpce_id" {
   value       = databricks_mws_vpc_endpoint.databricks_scc.id
 }
 
+output "security_group_classic_compute_id" {
+  description = "ID of the security group used for classic compute clusters"
+  value       = aws_security_group.databricks_classic_compute.id
+}
+
+output "security_group_backend_vpce_id" {
+  description = "ID of the security group used for Databricks backend VPCE"
+  value       = aws_security_group.databricks_backend_vpce.id
+}
+
 output "databricks_workspace_storage_key_id" {
   description = "ID of the Databricks Encryption Key Configuration used for workspace storage"
   value       = databricks_mws_customer_managed_keys.workspace_storage.customer_managed_key_id
