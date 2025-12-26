@@ -23,7 +23,7 @@ locals {
 }
 
  module "databricks_portfolio" {
-    source = "git::git::https://github.com/UKHomeOffice/databricks-portfolio-baseline-tf-module.git?ref=main"
+    source = "git::https://github.com/UKHomeOffice/databricks-portfolio-baseline-tf-module.git?ref=<commit_hash>"
 
     vpc_id                        = "vpc-xxxxxxxxxxxxxxxxx"
     private_route_table_id        = var.private_route_table_id
