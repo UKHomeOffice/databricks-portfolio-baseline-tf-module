@@ -18,6 +18,11 @@ output "security_group_backend_vpce_id" {
   value       = aws_security_group.databricks_backend_vpce.id
 }
 
+output "cross_account_role_arn" {
+  description = "ARN of the cross-account IAM role used to create Databricks classic compute clusters in the provided VPC"
+  value       = aws_iam_role.cross_account_role.arn
+}
+
 output "workspace_storage_key_arn" {
   description = "ARN of the KMS key used for workspace storage encryption and decryption operations"
   value       = aws_kms_key.databricks_workspace_storage.arn
