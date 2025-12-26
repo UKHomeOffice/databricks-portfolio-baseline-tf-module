@@ -263,7 +263,7 @@ resource "aws_vpc_endpoint" "databricks_rest" {
   service_name        = var.workspace_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.databricks_backend_vpce.id]
-  subnet_ids          = aws_subnet.private_backend.ids
+  subnet_ids          = [for s in aws_subnet.private_backend : s.id]
   private_dns_enabled = true
 
   tags = merge(var.tags, {
@@ -277,7 +277,7 @@ resource "aws_vpc_endpoint" "databricks_scc" {
   service_name        = var.scc_relay_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.databricks_backend_vpce.id]
-  subnet_ids          = aws_subnet.private_backend.ids
+  subnet_ids          = [for s in aws_subnet.private_backend : s.id]
   private_dns_enabled = true
 
   tags = merge(var.tags, {
