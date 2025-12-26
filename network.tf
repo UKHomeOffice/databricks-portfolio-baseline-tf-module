@@ -30,7 +30,7 @@ resource "aws_route_table_association" "private_backend" {
 # ==============================================================================
 
 resource "aws_network_acl" "private_backend" {
-  vpc_id    = var.vpc_id
+  vpc_id     = var.vpc_id
   subnet_ids = [for s in aws_subnet.private_backend : s.id]
 
   ingress {
@@ -52,7 +52,7 @@ resource "aws_network_acl" "private_backend" {
   }
 
   tags = merge(
-    var.tags, 
+    var.tags,
     {
       Name = "${var.resource_prefix}-nacl-private-backend"
     }
@@ -177,66 +177,66 @@ resource "aws_security_group" "databricks_backend_vpce" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "TCP 443 from Classic Compute SG"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    description     = "TCP 443 from Classic Compute SG"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Unity Catalog Metastore"
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
+    description     = "Unity Catalog Metastore"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Lakebase PostgreSQL"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
+    description     = "Lakebase PostgreSQL"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Secure Cluster Connectivity Compliance Security Profile"
-    from_port   = 2443
-    to_port     = 2443
-    protocol    = "tcp"
+    description     = "Secure Cluster Connectivity Compliance Security Profile"
+    from_port       = 2443
+    to_port         = 2443
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Secure Cluster Connectivity"
-    from_port   = 6666
-    to_port     = 6666
-    protocol    = "tcp"
+    description     = "Secure Cluster Connectivity"
+    from_port       = 6666
+    to_port         = 6666
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Compute Plane to Control Plane"
-    from_port   = 8443
-    to_port     = 8443
-    protocol    = "tcp"
+    description     = "Compute Plane to Control Plane"
+    from_port       = 8443
+    to_port         = 8443
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Unity Catalog Logging and Lineage Data Streaming"
-    from_port   = 8444
-    to_port     = 8444
-    protocol    = "tcp"
+    description     = "Unity Catalog Logging and Lineage Data Streaming"
+    from_port       = 8444
+    to_port         = 8444
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
   ingress {
-    description = "Future Extendability"
-    from_port   = 8445
-    to_port     = 8451
-    protocol    = "tcp"
+    description     = "Future Extendability"
+    from_port       = 8445
+    to_port         = 8451
+    protocol        = "tcp"
     security_groups = [aws_security_group.databricks_classic_compute.id]
   }
 
@@ -248,7 +248,7 @@ resource "aws_security_group" "databricks_backend_vpce" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.common_tags, {
+  tags = merge(var.tags, {
     Name = "${var.resource_prefix}-backend-vpce-sg"
   })
 }

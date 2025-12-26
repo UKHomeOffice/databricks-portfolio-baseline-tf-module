@@ -44,7 +44,7 @@ resource "aws_iam_role" "unity_catalog" {
   tags = merge(
     var.tags,
     {
-      Name    = local.uc_iam_role
+      Name = local.uc_iam_role
     }
   )
 }

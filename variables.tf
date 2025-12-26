@@ -18,6 +18,42 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
+variable "workspace_config" {
+  description = "REST API PrivateLink Endpoint configuration"
+  type = map(object({
+    primary_endpoint = string
+  }))
+  default = {
+    "eu-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-1.vpce-svc-0da6ebf1461278016"
+    }
+    "eu-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-2.vpce-svc-01148c7cdc1d1326c"
+    }
+  }
+}
+
+variable "scc_relay_config" {
+  description = "Secure Cluster Connectivity Relay configuration"
+  type = map(object({
+    primary_endpoint = string
+  }))
+  default = {
+    "eu-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-1.vpce-svc-09b4eb2bc775f4e8c"
+    }
+    "eu-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-2.vpce-svc-05279412bf5353a45"
+    }
+  }
+}
+
+variable "unity_catalog_iam_arn" {
+  type        = string
+  description = "Unity Catalog IAM ARN for the master role"
+  default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+}
+
 # Customer-managed VPC Networking Configuration
 variable "vpc_id" {
   description = "Custom VPC ID"
@@ -27,8 +63,11 @@ variable "vpc_id" {
 
 variable "private_backend_subnet_config" {
   description = "List of custom private subnet IDs"
-  type        = map(list(string))
-  default     = null
+  type = map(object({
+    cidr = string
+    az   = string
+  }))
+  default = null
 }
 
 variable "private_route_table_id" {
@@ -47,6 +86,12 @@ variable "sg_egress_ports" {
 variable "uc_catalog_name" {
   description = "UC catalog name."
   type        = string
+}
+
+variable "cmk_admin_arn" {
+  description = "Amazon Resource Name (ARN) of the CMK admin."
+  type        = string
+  default     = null
 }
 
 # Common variables to be applied to a large number of resources

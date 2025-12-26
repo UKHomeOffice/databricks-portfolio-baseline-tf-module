@@ -49,47 +49,58 @@ resource "aws_kms_alias" "catalog_storage_key_alias" {
 # KMS for Databricks Managed Services
 # ==============================================================================
 
-data "aws_iam_policy_document" "databricks_managed_services_cmk" {
-  version = "2012-10-17"
-  statement {
-    sid    = "Enable IAM User Permissions"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = [local.aws_account_id]
-    }
-    actions   = ["kms:*"]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "Allow Databricks to use KMS key for control plane managed services"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::414351767826:root"]
-    }
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt"
+resource "aws_kms_key" "databricks_managed_services" {
+  description = "KMS key for managed services"
+  policy = jsonencode({ Version : "2012-10-17",
+    "Id" : "key-policy-managed-services",
+    Statement : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [local.cmk_admin_value]
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow Databricks to use KMS key for managed services in the control plane",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${local.databricks_aws_account_id}:root"
+        },
+        "Action" : [
+          "kms:Encrypt",
+          "kms:Decrypt"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "StringEquals" : {
+            "aws:PrincipalTag/DatabricksAccountId" : [var.databricks_account_id]
+          }
+        }
+      }
     ]
-    resources = ["*"]
-  }
-}
+    }
+  )
 
-resource "aws_kms_key" "databricks_managed_services_key" {
-  policy = data.aws_iam_policy_document.databricks_managed_services_cmk.json
-  tags   = local.common_tags
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.resource_prefix}-managed-services-key"
+    }
+  )
 }
 
 resource "aws_kms_alias" "databricks_managed_services_key_alias" {
-  name          = "alias/databricks-managed-services-key-alias"
-  target_key_id = aws_kms_key.databricks_managed_services_key.key_id
+  name          = "alias/${var.resource_prefix}-managed-services-key"
+  target_key_id = aws_kms_key.databricks_managed_services.key_id
 }
 
 resource "databricks_mws_customer_managed_keys" "managed_services" {
   account_id = var.databricks_account_id
   aws_key_info {
-    key_arn   = aws_kms_key.databricks_managed_services_key.arn
+    key_arn   = aws_kms_key.databricks_managed_services.arn
     key_alias = aws_kms_alias.databricks_managed_services_key_alias.name
   }
   use_cases = ["MANAGED_SERVICES"]
@@ -99,88 +110,81 @@ resource "databricks_mws_customer_managed_keys" "managed_services" {
 # KMS for Databricks Workspace Storage
 # ==============================================================================
 
-data "aws_iam_policy_document" "databricks_workspace_storage_cmk" {
-  version = "2012-10-17"
-  statement {
-    sid    = "Enable IAM User Permissions"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = [local.aws_account_id]
-    }
-    actions   = ["kms:*"]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "Allow Databricks to use KMS key for DBFS"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::414351767826:root"]
-    }
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
+resource "aws_kms_key" "databricks_workspace_storage" {
+  description = "KMS key for databricks workspace storage"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    "Id" : "key-policy-workspace-storage",
+    Statement : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [local.cmk_admin_value]
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow Databricks to use KMS key for DBFS",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${local.databricks_aws_account_id}:root"
+        },
+        "Action" : [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "StringEquals" : {
+            "aws:PrincipalTag/DatabricksAccountId" : [var.databricks_account_id]
+          }
+        }
+      },
+      {
+        "Sid" : "Allow Databricks to use KMS key for EBS",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : aws_iam_role.cross_account_role.arn
+        },
+        "Action" : [
+          "kms:Decrypt",
+          "kms:GenerateDataKey*",
+          "kms:CreateGrant",
+          "kms:DescribeKey"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "ForAnyValue:StringLike" : {
+            "kms:ViaService" : "ec2.*.amazonaws.com"
+          }
+        }
+      }
     ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "Allow Databricks to use KMS key for DBFS (Grants)"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::414351767826:root"]
-    }
-    actions = [
-      "kms:CreateGrant",
-      "kms:ListGrants",
-      "kms:RevokeGrant"
-    ]
-    resources = ["*"]
-    condition {
-      test     = "Bool"
-      variable = "kms:GrantIsForAWSResource"
-      values   = ["true"]
-    }
-  }
-  statement {
-    sid    = "Allow Databricks to use KMS key for EBS"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = [var.databricks_cross_account_role_arn]
-    }
-    actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey*",
-      "kms:CreateGrant",
-      "kms:DescribeKey"
-    ]
-    resources = ["*"]
-    condition {
-      test     = "ForAnyValue:StringLike"
-      variable = "kms:ViaService"
-      values   = ["ec2.*.amazonaws.com"]
-    }
-  }
-}
+  })
+  depends_on = [aws_iam_role.cross_account_role]
 
-resource "aws_kms_key" "databricks_workspace_storage_key" {
-  policy = data.aws_iam_policy_document.databricks_workspace_storage_cmk.json
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.resource_prefix}-workspace-storage-key"
+    }
+  )
 }
 
 resource "aws_kms_alias" "databricks_workspace_storage_key_alias" {
-  name          = "alias/databricks-workspace-storage-key-alias"
-  target_key_id = aws_kms_key.databricks_workspace_storage_key.key_id
+  name          = "alias/${var.resource_prefix}-workspace-storage-key"
+  target_key_id = aws_kms_key.databricks_workspace_storage.id
 }
 
 resource "databricks_mws_customer_managed_keys" "workspace_storage" {
   account_id = var.databricks_account_id
   aws_key_info {
-    key_arn   = aws_kms_key.databricks_workspace_storage_key.arn
+    key_arn   = aws_kms_key.databricks_workspace_storage.arn
     key_alias = aws_kms_alias.databricks_workspace_storage_key_alias.name
   }
   use_cases = ["STORAGE"]

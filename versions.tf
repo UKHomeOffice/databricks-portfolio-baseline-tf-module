@@ -35,7 +35,7 @@ provider "aws" {
 
 provider "databricks" {
   alias      = "mws"
-  host       = local.computed_databricks_provider_host
+  host       = local.databricks_provider_host
   account_id = var.databricks_account_id
 }
 
