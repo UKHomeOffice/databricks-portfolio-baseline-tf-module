@@ -1,11 +1,11 @@
 # Unity Catalog S3
 resource "aws_s3_bucket" "unity_catalog_bucket" {
-  bucket        = var.uc_catalog_name
+  bucket        = "${var.resource_prefix}-unity-catalog-${local.uc_catalog_bucket_name}"
   force_destroy = true
   tags = merge(
     var.tags,
     {
-      Name = var.uc_catalog_name
+      Name = "${var.resource_prefix}-unity-catalog-${local.uc_catalog_bucket_name}"
     }
   )
 }
