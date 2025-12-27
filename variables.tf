@@ -18,6 +18,12 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
+variable "databricks_metastore_id" {
+  description = "ID of the Databricks metastore for the current cloud region and Databricks account"
+  type        = string
+  default     = null
+}
+
 variable "workspace_config" {
   description = "REST API PrivateLink Endpoint configuration"
   type = map(object({
