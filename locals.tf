@@ -12,7 +12,8 @@ locals {
 
   databricks_artifact_and_sample_data_account_id = "414351767826"
 
-  unity_catalog_iam_arn = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+  unity_catalog_iam_arn  = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+  uc_catalog_bucket_name = replace(lower(var.uc_catalog_name), "_", "-")
 
   cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws:iam::${local.aws_account_id}:root" : var.cmk_admin_arn
 
