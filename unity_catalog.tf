@@ -29,7 +29,7 @@ data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
 # Unity Catalog Policy - Data Source
 data "databricks_aws_unity_catalog_policy" "unity_catalog" {
   aws_account_id = local.aws_account_id
-  bucket_name    = var.uc_catalog_name
+  bucket_name    = aws_s3_bucket.unity_catalog_bucket.id
   role_name      = local.uc_iam_role
   kms_name       = aws_kms_alias.catalog_storage_key_alias.arn
 }
