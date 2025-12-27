@@ -8,6 +8,9 @@ resource "time_sleep" "wait_60_seconds" {
 
 # Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
 resource "databricks_storage_credential" "catalog_storage_credential" {
+  provider     = databricks.mws
+  metastore_id = var.databricks_metastore_id
+
   name = "${var.uc_catalog_name}-storage-credential"
   aws_iam_role {
     role_arn = "arn:aws:iam::${local.aws_account_id}:role/${local.uc_iam_role}"
