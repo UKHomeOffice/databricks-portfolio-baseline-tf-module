@@ -19,7 +19,7 @@ resource "aws_subnet" "private_backend" {
 # ==============================================================================
 
 resource "aws_route_table_association" "private_backend" {
-  for_each = var.private_backend_subnet_config
+  for_each = aws_subnet.private_backend
 
   subnet_id      = each.value.id
   route_table_id = var.private_route_table_id
