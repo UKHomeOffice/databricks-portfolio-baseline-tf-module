@@ -16,6 +16,7 @@ resource "databricks_mws_workspaces" "admin" {
 }
 
 resource "databricks_metastore_assignment" "default_metastore" {
+  provider     = databricks.mws
   workspace_id = databricks_mws_workspaces.admin.workspace_id
   metastore_id = var.databricks_metastore_id
 }
