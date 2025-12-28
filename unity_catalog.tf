@@ -59,22 +59,32 @@ resource "aws_iam_policy_attachment" "unity_catalog_attach" {
   policy_arn = aws_iam_policy.unity_catalog.arn
 }
 
+resource "databricks_mws_workspaces" "admin" {
+  provider       = databricks.mws
+  account_id     = var.databricks_account_id
+  aws_region     = var.region
+  workspace_name = "${var.resource_prefix}-serverless-admin"
+  compute_mode   = "SERVERLESS"
+}
+
 # External Location
 resource "databricks_external_location" "workspace_catalog_external_location" {
-  name            = "${var.uc_catalog_name}-external-location"
-  url             = "s3://${var.uc_catalog_name}/"
+  provider        = databricks.created_workspace
+  name            = "${local.uc_catalog_bucket_name}-external-location"
+  url             = "s3://${local.uc_catalog_bucket_name}/"
   credential_name = databricks_storage_credential.catalog_storage_credential.id
   comment         = "External location for catalog ${var.uc_catalog_name}"
   isolation_mode  = "ISOLATION_MODE_ISOLATED"
-  depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds]
+  depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds, databricks_mws_workspaces.admin]
 }
 
 # Workspace Catalog
 resource "databricks_catalog" "workspace_catalog" {
+  provider       = databricks.created_workspace
   name           = local.uc_catalog_name_us
   comment        = "This catalog is for - ${var.resource_prefix}"
   isolation_mode = "ISOLATED"
-  storage_root   = "s3://${var.uc_catalog_name}/"
+  storage_root   = "s3://${local.uc_catalog_bucket_name}/"
   properties = {
     purpose = "Catalog for - ${var.resource_prefix}"
   }
