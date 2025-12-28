@@ -15,6 +15,11 @@ resource "databricks_mws_workspaces" "admin" {
   compute_mode   = "SERVERLESS"
 }
 
+resource "databricks_metastore_assignment" "default_metastore" {
+  workspace_id = databricks_mws_workspaces.admin.workspace_id
+  metastore_id = var.databricks_metastore_id
+}
+
 # Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
 resource "databricks_storage_credential" "catalog_storage_credential" {
   provider     = databricks.created_workspace
@@ -27,6 +32,7 @@ resource "databricks_storage_credential" "catalog_storage_credential" {
   }
 
   isolation_mode = "ISOLATION_MODE_ISOLATED"
+  depends_on     = [databricks_mws_workspaces.admin, databricks_metastore_assignment.default_metastore]
 }
 
 # Unity Catalog Trust Policy - Data Source
