@@ -69,7 +69,7 @@ resource "databricks_external_location" "workspace_catalog_external_location" {
   credential_name = databricks_storage_credential.catalog_storage_credential.id
   comment         = "External location for catalog ${var.uc_catalog_name}"
   isolation_mode  = "ISOLATION_MODE_ISOLATED"
-  depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds, databricks_mws_workspaces.admin]
+  depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds]
 }
 
 # Workspace Catalog
