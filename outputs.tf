@@ -1,7 +1,3 @@
-output "DEBUG_databricks_admin_workspace_host" {
-  value = var.databricks_admin_workspace_host
-}
-
 output "databricks_rest_vpce_id" {
   description = "ID of the Databricks VPC Endpoint Registraion used for REST"
   value       = databricks_mws_vpc_endpoint.databricks_rest.id
