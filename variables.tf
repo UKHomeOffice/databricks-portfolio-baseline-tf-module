@@ -24,6 +24,12 @@ variable "databricks_metastore_id" {
   default     = null
 }
 
+variable "databricks_admin_workspace_host" {
+  description = "URL of the admin Databricks workspace for the portfolio"
+  type        = string
+  default     = null
+}
+
 variable "workspace_config" {
   description = "REST API PrivateLink Endpoint configuration"
   type = map(object({
