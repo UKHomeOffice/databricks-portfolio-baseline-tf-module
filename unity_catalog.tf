@@ -6,21 +6,6 @@ resource "time_sleep" "wait_60_seconds" {
   create_duration = "60s"
 }
 
-# Create a workspace specifically for catalog-level UC objects and storage
-resource "databricks_mws_workspaces" "admin" {
-  provider       = databricks.mws
-  account_id     = var.databricks_account_id
-  aws_region     = var.region
-  workspace_name = "${var.resource_prefix}-serverless-admin"
-  compute_mode   = "SERVERLESS"
-}
-
-resource "databricks_metastore_assignment" "default_metastore" {
-  provider     = databricks.mws
-  workspace_id = databricks_mws_workspaces.admin.workspace_id
-  metastore_id = var.databricks_metastore_id
-}
-
 # Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
 resource "databricks_storage_credential" "catalog_storage_credential" {
   provider     = databricks.created_workspace
@@ -32,7 +17,7 @@ resource "databricks_storage_credential" "catalog_storage_credential" {
     role_arn = "arn:aws:iam::${local.aws_account_id}:role/${local.uc_iam_role}"
   }
 
-  # isolation_mode = "ISOLATION_MODE_ISOLATED"
+  isolation_mode = "ISOLATION_MODE_ISOLATED"
   depends_on     = [databricks_mws_workspaces.admin, databricks_metastore_assignment.default_metastore]
 }
 
