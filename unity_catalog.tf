@@ -32,7 +32,7 @@ resource "databricks_storage_credential" "catalog_storage_credential" {
     role_arn = "arn:aws:iam::${local.aws_account_id}:role/${local.uc_iam_role}"
   }
 
-  isolation_mode = "ISOLATION_MODE_ISOLATED"
+  # isolation_mode = "ISOLATION_MODE_ISOLATED"
   depends_on     = [databricks_mws_workspaces.admin, databricks_metastore_assignment.default_metastore]
 }
 
