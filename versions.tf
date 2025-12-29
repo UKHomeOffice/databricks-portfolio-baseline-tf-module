@@ -41,5 +41,5 @@ provider "databricks" {
 
 provider "databricks" {
   alias = "created_workspace"
-  host  = var.databricks_admin_workspace_host
+  host  = local.databricks_admin_workspace_host
 }
