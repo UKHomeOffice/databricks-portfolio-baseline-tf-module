@@ -18,7 +18,6 @@ resource "databricks_storage_credential" "catalog_storage_credential" {
   }
 
   isolation_mode = "ISOLATION_MODE_ISOLATED"
-  depends_on     = [databricks_mws_workspaces.admin, databricks_metastore_assignment.default_metastore]
 }
 
 # Unity Catalog Trust Policy - Data Source
