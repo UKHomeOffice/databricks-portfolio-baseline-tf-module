@@ -98,6 +98,7 @@ resource "aws_kms_alias" "databricks_managed_services_key_alias" {
 }
 
 resource "databricks_mws_customer_managed_keys" "managed_services" {
+  provider   = databricks.mws
   account_id = var.databricks_account_id
   aws_key_info {
     key_arn   = aws_kms_key.databricks_managed_services.arn
@@ -182,6 +183,7 @@ resource "aws_kms_alias" "databricks_workspace_storage_key_alias" {
 }
 
 resource "databricks_mws_customer_managed_keys" "workspace_storage" {
+  provider   = databricks.mws
   account_id = var.databricks_account_id
   aws_key_info {
     key_arn   = aws_kms_key.databricks_workspace_storage.arn
