@@ -1,3 +1,7 @@
+output "DEBUG_databricks_admin_workspace_host_var" {
+  value = var.databricks_admin_workspace_host
+}
+
 output "DEBUG_databricks_admin_workspace_host" {
   value = local.databricks_admin_workspace_host
 }
