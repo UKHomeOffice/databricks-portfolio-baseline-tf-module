@@ -6,7 +6,7 @@ locals {
   assume_role_partition = "aws"
 
   databricks_provider_host        = "https://accounts.cloud.databricks.com"
-  databricks_admin_workspace_host = "https://${trimspace(replace(var.databricks_admin_workspace_host, "https://", ""))}"
+  databricks_admin_workspace_host = "https://${trimsuffix(replace(trimspace(var.databricks_admin_workspace_host), "https://", ""), "/")}"
 
   databricks_aws_account_id       = "414351767826"
   databricks_ec2_image_account_id = "601306020600"
