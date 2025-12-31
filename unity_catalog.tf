@@ -11,7 +11,7 @@ resource "databricks_storage_credential" "catalog_storage_credential" {
   provider     = databricks.created_workspace
   metastore_id = var.databricks_metastore_id
 
-  name = "${var.uc_catalog_name}-storage-credential"
+  name = "${local.uc_catalog_bucket_name}-storage-credential"
 
   aws_iam_role {
     role_arn = "arn:aws:iam::${local.aws_account_id}:role/${local.uc_iam_role}"
