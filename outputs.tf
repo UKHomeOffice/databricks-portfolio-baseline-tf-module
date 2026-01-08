@@ -8,12 +8,12 @@ output "DEBUG_databricks_admin_workspace_host" {
 
 output "databricks_rest_vpce_id" {
   description = "ID of the Databricks VPC Endpoint Registraion used for REST"
-  value       = databricks_mws_vpc_endpoint.databricks_rest.id
+  value       = databricks_mws_vpc_endpoint.databricks_rest.vpc_endpoint_id
 }
 
 output "databricks_scc_vpce_id" {
   description = "ID of the Databricks VPC Endpoint Registraion used for SCC Relay"
-  value       = databricks_mws_vpc_endpoint.databricks_scc.id
+  value       = databricks_mws_vpc_endpoint.databricks_scc.vpc_endpoint_id
 }
 
 output "security_group_classic_compute_id" {
