@@ -129,8 +129,8 @@ resource "databricks_grants" "schema_dem_bronze" {
     principal = databricks_group.data_engineering.display_name
     privileges = [
       "USE SCHEMA",
-      "CREATE TABLE",
-      "CREATE VIEW"
+      "CREATE TABLE"
+      #"CREATE VIEW"
     ]
   }
 }
