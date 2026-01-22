@@ -102,10 +102,10 @@ resource "databricks_mws_permission_assignment" "data_engineering_ws_user" {
 # Grant base access on the catalog
 resource "databricks_grants" "catalog_grants" {
   provider = databricks.created_workspace
-  catalog  = module.databricks_portfolio_baseline.catalog_name
+  catalog  = databricks_catalog.workspace_catalog.name
 
   grant {
-    principal = data.databricks_group.data_engineers.display_name
+    principal = databricks_group.data_engineering.display_name
     privileges = [
       "USE CATALOG"
     ]
@@ -115,7 +115,7 @@ resource "databricks_grants" "catalog_grants" {
 # Create a schema
 resource "databricks_schema" "dem_bronze" {
   provider     = databricks.created_workspace
-  catalog_name = module.databricks_portfolio_baseline.catalog_name
+  catalog_name = databricks_catalog.workspace_catalog.name
   name         = "dem_bronze"
   comment      = "Bronze schema for DEM tech spike data ingestion"
 }
