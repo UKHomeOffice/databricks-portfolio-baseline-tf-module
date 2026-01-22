@@ -107,6 +107,7 @@ resource "databricks_grants" "catalog_grants" {
   grant {
     principal = databricks_group.data_engineering.display_name
     privileges = [
+      "MANAGE",
       "USE CATALOG"
     ]
   }
