@@ -123,10 +123,10 @@ resource "databricks_schema" "dem_bronze" {
 # Grant create+use on the target schema
 resource "databricks_grants" "schema_dem_bronze" {
   provider = databricks.created_workspace
-  schema   = "${module.databricks_portfolio_baseline.catalog_name}.${databricks_schema.dem_bronze.name}"
+  schema   = "${databricks_catalog.workspace_catalog.name}.${databricks_schema.dem_bronze.name}"
 
   grant {
-    principal = data.databricks_group.data_engineers.display_name
+    principal = databricks_group.data_engineering.display_name
     privileges = [
       "USE SCHEMA",
       "CREATE TABLE",
