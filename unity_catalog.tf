@@ -84,3 +84,45 @@ resource "databricks_catalog" "workspace_catalog" {
   }
   depends_on = [databricks_external_location.workspace_catalog_external_location]
 }
+
+# Look up existing workspace group
+data "databricks_group" "data_engineers" {
+  provider     = databricks.created_workspace
+  display_name = "Data Engineer"
+}
+
+# Grant base access on the catalog
+resource "databricks_grants" "catalog_grants" {
+  provider = databricks.created_workspace
+  catalog  = module.databricks_portfolio_baseline.catalog_name
+
+  grant {
+    principal = data.databricks_group.data_engineers.display_name
+    privileges = [
+      "USE CATALOG"
+    ]
+  }
+}
+
+# Create a schema
+resource "databricks_schema" "dem_bronze" {
+  provider     = databricks.created_workspace
+  catalog_name = module.databricks_portfolio_baseline.catalog_name
+  name         = "dem_bronze"
+  comment      = "Bronze schema for DEM tech spike data ingestion"
+}
+
+# Grant create+use on the target schema
+resource "databricks_grants" "schema_dem_bronze" {
+  provider = databricks.created_workspace
+  schema   = "${module.databricks_portfolio_baseline.catalog_name}.${databricks_schema.dem_bronze.name}"
+
+  grant {
+    principal = data.databricks_group.data_engineers.display_name
+    privileges = [
+      "USE SCHEMA",
+      "CREATE TABLE",
+      "CREATE VIEW"
+    ]
+  }
+}
