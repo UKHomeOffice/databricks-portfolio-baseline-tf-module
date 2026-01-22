@@ -85,12 +85,20 @@ resource "databricks_catalog" "workspace_catalog" {
   depends_on = [databricks_external_location.workspace_catalog_external_location]
 }
 
-# Look up existing workspace group
-data "databricks_group" "data_engineers" {
-  provider     = databricks.created_workspace
-  display_name = "Data Engineer"
+# Create Data Engineering User Group at Account Level
+resource "databricks_group" "data_engineering" {
+  provider     = databricks.mws
+  display_name = "Data Engineering"
 }
-
+/*
+# Assign the Data Engineering User Group to a Workspace
+resource "databricks_mws_permission_assignment" "data_engineering_ws_user" {
+  provider     = databricks.mws
+  workspace_id = databricks_mws_workspaces.this.workspace_id # TODO: Need to pass in the workspace ID of 
+  principal_id = databricks_group.data_engineering.id
+  permissions  = ["USER"]
+}
+*/
 # Grant base access on the catalog
 resource "databricks_grants" "catalog_grants" {
   provider = databricks.created_workspace
