@@ -118,6 +118,13 @@ resource "databricks_grants" "catalog_grants" {
       "USE CATALOG"
     ]
   }
+
+  grant {
+    principal = databricks_service_principal.service_principal_ldp.display_name
+    privileges = [
+      "USE CATALOG"
+    ]
+  }
 }
 
 # Create a schema
@@ -138,7 +145,14 @@ resource "databricks_grants" "schema_dem_bronze" {
     privileges = [
       "USE SCHEMA",
       "CREATE TABLE"
-      #"CREATE VIEW"
+    ]
+  }
+
+  grant {
+    principal = databricks_service_principal.service_principal_ldp.display_name
+    privileges = [
+      "USE SCHEMA",
+      "CREATE TABLE"
     ]
   }
 }
