@@ -88,8 +88,15 @@ resource "databricks_catalog" "workspace_catalog" {
 # Create Data Engineering User Group at Account Level
 resource "databricks_group" "data_engineering" {
   provider     = databricks.mws
-  display_name = "Data Engineering"
+  display_name = var.user_group_data_engineering
 }
+
+# Create a service principal for running Lakeflow Declarative Pipelines at Account Level
+resource "databricks_service_principal" "service_principal_ldp" {
+  provider     = databricks.mws
+  display_name = var.service_principal_ldp
+}
+
 /*
 # Assign the Data Engineering User Group to a Workspace
 resource "databricks_mws_permission_assignment" "data_engineering_ws_user" {

@@ -85,6 +85,7 @@ No modules.
 | <a name="input_sg_egress_ports"></a> [sg\_egress\_ports](#input\_sg\_egress\_ports) | A list of ports to allow outbound network traffic from the classic compute clusters SG | `list(string)` | `[]` | no |
 | <a name="input_resource_prefix"></a> [vpc\_id](#input\_resource\_prefix) | The prefix to use when applying names to resources | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
+| <a name="input_user_group_data_engineering"></a> [user\_group\_data\_engineering](#input\_user\_group\_data\_engineering) | Display name of the user group to create for the Data Engineering team | `string` | n/a | yes |
 
 ## Outputs
 

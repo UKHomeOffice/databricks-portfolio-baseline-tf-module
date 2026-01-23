@@ -60,12 +60,6 @@ variable "scc_relay_config" {
   }
 }
 
-variable "unity_catalog_iam_arn" {
-  type        = string
-  description = "Unity Catalog IAM ARN for the master role"
-  default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
-}
-
 # Customer-managed VPC Networking Configuration
 variable "vpc_id" {
   description = "Custom VPC ID"
@@ -95,11 +89,6 @@ variable "sg_egress_ports" {
   default     = [null]
 }
 
-variable "uc_catalog_name" {
-  description = "UC catalog name."
-  type        = string
-}
-
 variable "cmk_admin_arn" {
   description = "Amazon Resource Name (ARN) of the CMK admin."
   type        = string
@@ -121,4 +110,26 @@ variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
   default     = {}
+}
+
+# Unity Catalog and Permissions
+variable "uc_catalog_name" {
+  description = "UC catalog name."
+  type        = string
+}
+
+variable "unity_catalog_iam_arn" {
+  type        = string
+  description = "Unity Catalog IAM ARN for the master role"
+  default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+}
+
+variable "user_group_data_engineering" {
+  description = "Display name of the Data Engineering user group."
+  type        = string
+}
+
+variable "service_principal_ldp" {
+  description = "Display name of the Service Principal that runs Lakeflow Declarative Pipelines."
+  type        = string
 }

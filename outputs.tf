@@ -55,3 +55,9 @@ output "catalog_name" {
   description = "Name of the UC catalog that was created"
   value       = databricks_catalog.workspace_catalog.name
 }
+
+output "service_principal_ldp_id" {
+  description = "Id of the Service Principal that was created for running Lakeflow Declarative Pipelines"
+  value       = databricks_service_principal.service_principal_ldp.id
+}
+
