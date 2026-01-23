@@ -61,3 +61,7 @@ output "service_principal_ldp_id" {
   value       = databricks_service_principal.service_principal_ldp.id
 }
 
+output "service_principal_ldp_name" {
+  description = "Display name of the Service Principal that was created for running Lakeflow Declarative Pipelines"
+  value       = databricks_service_principal.service_principal_ldp.display_name
+}
