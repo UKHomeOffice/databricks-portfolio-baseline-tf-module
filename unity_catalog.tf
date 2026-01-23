@@ -120,7 +120,7 @@ resource "databricks_grants" "catalog_grants" {
   }
 
   grant {
-    principal = databricks_service_principal.service_principal_ldp.display_name
+    principal = databricks_service_principal.service_principal_ldp.application_id
     privileges = [
       "USE CATALOG"
     ]
@@ -149,7 +149,7 @@ resource "databricks_grants" "schema_dem_bronze" {
   }
 
   grant {
-    principal = databricks_service_principal.service_principal_ldp.display_name
+    principal = databricks_service_principal.service_principal_ldp.application_id
     privileges = [
       "USE SCHEMA",
       "CREATE TABLE"
