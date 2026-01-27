@@ -123,13 +123,3 @@ variable "unity_catalog_iam_arn" {
   description = "Unity Catalog IAM ARN for the master role"
   default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
 }
-
-variable "user_group_data_engineering" {
-  description = "Display name of the Data Engineering user group."
-  type        = string
-}
-
-variable "service_principal_ldp" {
-  description = "Display name of the Service Principal that runs Lakeflow Declarative Pipelines."
-  type        = string
-}
